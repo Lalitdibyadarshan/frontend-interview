@@ -1,0 +1,13 @@
+{
+  "name": "frontend-interview",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "repository": "https://github.com/Lalitdibyadarshan/frontend-interview.git",
+  "author": "Lalit Dibyadarshan",
+  "license": "MIT",
+  "dependencies": {
+    "prettier": "^3.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trello Board Example</title>
+    <style>
+      .board {
+        display: flex;
+        justify-content: space-around;
+        padding: 20px;
+      }
+
+      .list {
+        width: 200px;
+        background-color: #f4f4f4;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .card {
+        background-color: #fff;
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 3px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        cursor: grab;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="board">
+      <div class="list" id="todo">
+        <h3>To Do</h3>
+      </div>
+      <div class="list" id="in-progress">
+        <h3>In Progress</h3>
+      </div>
+      <div class="list" id="done">
+        <h3>Done</h3>
+      </div>
+    </div>
+
+    <script>
+      const lists = document.querySelectorAll(".list");
+
+      let draggedCard = null;
+
+      // Load the state from localStorage when the page loads
+      document.addEventListener("DOMContentLoaded", loadState);
+
+      lists.forEach((list) => {
+        list.addEventListener("dragover", (e) => {
+          e.preventDefault();
+        });
+
+        list.addEventListener("dragenter", (e) => {
+          e.preventDefault();
+          list.style.backgroundColor = "rgba(0, 0, 0, 0.0)";
+        });
+
+        list.addEventListener("dragleave", () => {
+          list.style.backgroundColor = "#f4f4f4";
+        });
+
+        list.addEventListener("drop", () => {
+          list.style.backgroundColor = "#f4f4f4";
+          if (draggedCard) {
+            list.appendChild(draggedCard);
+            saveState();
+          }
+        });
+      });
+
+      document.addEventListener("dragstart", (e) => {
+        if (e.target.classList.contains("card")) {
+          draggedCard = e.target;
+          // setTimeout(() => {
+          // draggedCard.style.display = "none";
+          // draggedCard.style.border = "1px red solid";
+          // }, 0);
+        }
+      });
+
+      document.addEventListener("dragend", (e) => {
+        if (draggedCard) {
+          setTimeout(() => {
+            draggedCard.style.display = "block";
+            draggedCard.style.border = "none";
+
+            draggedCard = null;
+          }, 0);
+        }
+      });
+
+      function saveState() {
+        const state = {};
+        lists.forEach((list) => {
+          const cards = Array.from(list.querySelectorAll(".card")).map(
+            (card) => card.textContent,
+          );
+          state[list.id] = cards;
+        });
+        localStorage.setItem("boardState", JSON.stringify(state));
+      }
+
+      function loadState() {
+        const state = JSON.parse(localStorage.getItem("boardState"));
+        if (state) {
+          lists.forEach((list) => {
+            list.innerHTML = `<h3>${list.querySelector("h3").textContent}</h3>`;
+            state[list.id].forEach((cardText) => {
+              const card = document.createElement("div");
+              card.className = "card";
+              card.draggable = true;
+              card.textContent = cardText;
+              list.appendChild(card);
+            });
+          });
+        } else {
+          // If no state is saved, populate with default tasks
+          const defaultTasks = {
+            todo: ["Task 1", "Task 2"],
+            "in-progress": ["Task 3"],
+            done: ["Task 4"],
+          };
+          Object.keys(defaultTasks).forEach((listId) => {
+            const list = document.getElementById(listId);
+            defaultTasks[listId].forEach((cardText) => {
+              const card = document.createElement("div");
+              card.className = "card";
+              card.draggable = true;
+              card.textContent = cardText;
+              list.appendChild(card);
+            });
+          });
+        }
+      }
+    </script>
+  </body>
+</html>

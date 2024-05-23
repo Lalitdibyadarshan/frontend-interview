@@ -1,25 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
+import { usePrevious } from "./hooks/usePrevious";
+import { useIdle } from "./hooks/useIdle";
+import { useDebounce } from "./hooks/useDebounce";
+import { useResponsive } from "./hooks/useResponsive";
 
 function App() {
+  const [currentVal, setCurrentVal] = useState(0);
+  const value = usePrevious(currentVal);
+  const isIdle = useIdle(2000);
+  const screen = useResponsive();
+  console.log(value);
+
+  const debounced = useDebounce(() => setCurrentVal((prev) => prev + 1), 2000);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+    <>
+      {
         <p>
-          Edit <code>src/App.tsx</code> and save to reload.
+          currentVal {currentVal}, prevVal: {value}
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      }
+      {<p>isIdle {isIdle + ""}</p>}
+      {<p>screen {JSON.stringify(screen)}</p>}
+      <button onClick={() => debounced()}>+</button>
+    </>
   );
 }
 
